@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="app">
+    <p id="text"></p>
+</div>
+<!--<div id="app">-->
+<!--    <p>{{name}}</p>-->
+<!--    <p k-text="name"></p>-->
+<!--    <p>{{age}}</p>-->
+<!--    <input type="text" k-model="name">-->
+<!--    <button @click="changeName">呵呵</button>-->
+<!--    <div k-html="html"></div>-->
+<!--</div>-->
+<script src='kvue.js'></script>
+<!--<script src='./compile.js'></script>-->
+<script>
+    // const kaikeba = new KVue({
+    //     el: '#app',
+    //     data: {
+    //         name: "I am test.",
+    //         age: 12,
+    //         html: '<button>这是⼀一个按钮</button>'
+    //     },
+    //     created() {
+    //         console.log('开始啦')
+    //         setTimeout(() => {
+    //             debugger
+    //             this.name = '我是测试'
+    //         }, 1500)
+    //     },
+    //     methods: {
+    //         changeName() {
+    //             this.name = '哈喽，开课吧'
+    //             this.age = 1
+    //         }
+    //     }
+    // })
+    const app = new KVue({
+        el: '#app',
+        data: {
+            a: 1,
+            b: '123',
+            c: {
+                a: 1,
+            }
+        }
+    })
+    new Watcher(app, document.querySelector('#text'), ['c', 'a'])
+    setTimeout(() => {
+        app.c.a = 'text123'
+    })
+</script>
+</body>
+</html>
