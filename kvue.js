@@ -7,9 +7,10 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
 };
 var KVue = /** @class */ (function () {
     function KVue(options) {
-        this.$el = document.querySelector(options.el);
+        this.$el = (typeof options.el === 'string') ? document.querySelector(options.el) : options.el;
         this.$options = options;
         this.$data = observe(this, options.data);
+        this.$compile = new Compile(this.$el, this);
     }
     KVue.prototype.proxyData = function (data) {
         var _this = this;
@@ -43,10 +44,10 @@ var Dep = /** @class */ (function () {
     return Dep;
 }());
 var Watcher = /** @class */ (function () {
-    function Watcher(vm, el, deps) {
+    function Watcher(vm, deps, cb) {
         var _this = this;
-        this.$el = el;
         this.$vm = vm;
+        this.$cb = cb;
         this.update(deps.reduce(function (vm, key, index) {
             if (index === deps.length - 1) {
                 Dep.target = _this;
@@ -56,7 +57,7 @@ var Watcher = /** @class */ (function () {
         Dep.target = null;
     }
     Watcher.prototype.update = function (val) {
-        this.$el.textContent = val;
+        this.$cb.call(this.$vm, val);
     };
     return Watcher;
 }());
@@ -90,3 +91,69 @@ function observe(vm, value, fullDeps) {
     }
     return value;
 }
+var Compile = /** @class */ (function () {
+    function Compile(el, vm) {
+        this.$el = el;
+        this.$vm = vm;
+        this.$fragment = this.node2Fragment();
+        this.compile(this.$fragment);
+        this.$el.appendChild(this.$fragment);
+    }
+    Compile.prototype.node2Fragment = function () {
+        var fragment = document.createDocumentFragment();
+        while (this.$el.firstChild) {
+            fragment.appendChild(this.$el.firstChild);
+        }
+        return fragment;
+    };
+    Compile.prototype.compile = function (el) {
+        var _this = this;
+        Array.prototype.forEach.call(el.childNodes, function (node) {
+            if (node.nodeType === 1) {
+                _this.compileElement(node);
+            }
+            else if (_this.isInter(node)) {
+                _this.compileText(node, _this.getExp(node.textContent));
+            }
+            if (node.children && node.childNodes.length > 0) {
+                _this.compile(node);
+            }
+        });
+    };
+    Compile.prototype.isInter = function (node) {
+        return node.nodeType === 3 && /\{\{(.+)\}\}/.test(node.textContent);
+    };
+    Compile.prototype.getExp = function (str) {
+        var result = str.match(/\{\{(.+)\}\}/);
+        return result && result[1];
+    };
+    Compile.prototype.compileElement = function (node) {
+        var attrs = node.getAttributeNames();
+        var self = this;
+        attrs.forEach(function (attrName) {
+            if (attrName.indexOf('k-') === 0) {
+                debugger;
+                var dir = attrName.substr(2);
+                var attrValue = node.getAttribute(attrName);
+                var directiveName = "directive" + (dir[0].toUpperCase() + dir.substr(1));
+                self[directiveName] && self[directiveName](node, attrValue);
+            }
+        });
+    };
+    Compile.prototype.compileText = function (node, exp) {
+        this.update(node, exp.split('.'), 'text');
+    };
+    Compile.prototype.directiveText = function (node, exp) {
+        this.update(node, exp.split('.'), 'text');
+    };
+    Compile.prototype.update = function (node, deps, type) {
+        var self = this;
+        new Watcher(this.$vm, deps, function (val) {
+            self[type + 'Update'](node, val);
+        });
+    };
+    Compile.prototype.textUpdate = function (node, val) {
+        node.textContent = val;
+    };
+    return Compile;
+}());
