@@ -45,7 +45,18 @@
                 years: 3,
                 class: '4-1'
             }
-        }
+        },
+        created() {
+            console.log('start')
+            setTimeout(() => {
+                this.changeStatus()
+            }, 1000)
+        },
+        methods: {
+            changeStatus() {
+                this.title = '学生简介'
+            }
+        },
     })
 </script>
 </body>

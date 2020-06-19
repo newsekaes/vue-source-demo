@@ -1,9 +1,22 @@
-var __spreadArrays = (this && this.__spreadArrays) || function () {
-    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-    for (var r = Array(s), k = 0, i = 0; i < il; i++)
-        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-            r[k] = a[j];
-    return r;
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spread = (this && this.__spread) || function () {
+    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+    return ar;
 };
 var KVue = /** @class */ (function () {
     function KVue(options) {
@@ -11,6 +24,12 @@ var KVue = /** @class */ (function () {
         this.$options = options;
         this.$data = observe(this, options.data);
         this.$compile = new Compile(this.$el, this);
+        if (options.created) {
+            options.created.call(this);
+        }
+        if (options.methods) {
+            Object.assign(this, options.methods);
+        }
     }
     KVue.prototype.proxyData = function (data) {
         var _this = this;
@@ -66,7 +85,7 @@ function observe(vm, value, fullDeps) {
     if (value instanceof Object) {
         var observer_1 = {};
         Object.keys(value).forEach(function (key) {
-            var _fullDeps = __spreadArrays(fullDeps, [key]);
+            var _fullDeps = __spread(fullDeps, [key]);
             var deps = new Dep();
             value[key] = observe(vm, value[key], _fullDeps);
             Object.defineProperty(observer_1, key, {
@@ -132,7 +151,6 @@ var Compile = /** @class */ (function () {
         var self = this;
         attrs.forEach(function (attrName) {
             if (attrName.indexOf('k-') === 0) {
-                debugger;
                 var dir = attrName.substr(2);
                 var attrValue = node.getAttribute(attrName);
                 var directiveName = "directive" + (dir[0].toUpperCase() + dir.substr(1));
@@ -157,3 +175,4 @@ var Compile = /** @class */ (function () {
     };
     return Compile;
 }());
+//# sourceMappingURL=kvue.js.map

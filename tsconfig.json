@@ -1,0 +1,49 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": "./",
+    //.表示当前文件所在目录，./就代表这个目录下的某个文件的路径
+//    "sourceMap": true,
+    // Enables experimental support for ES decorators.
+    "declaration": false,
+    // 生成相应的 .d.ts文件。
+    "downlevelIteration": true,
+    // Provide full support for iterables in for..of, spread and destructuring when targeting ES5 or ES3.
+    "experimentalDecorators": true,
+    "module": "esnext",
+    // 指定生成哪个模块系统代码
+
+    // 使用哪种方式解析模块，有 Classic 和 Node 两种方式。
+    // 如果使用相对路径导入，两种方式一致，都是根据当前文件路径去寻找模块
+    // 如果使用非相对路径导入，如 import { Component } from '@angular/core'; 则
+    // 对于 Classic：
+    // 编译器会从包含导入文件的目录开始依次向上级目录遍历，尝试定位匹配的声明文件
+    // 对于 Node：
+    // 会在一个特殊的文件夹 node_modules里查找你的模块。
+    // node_modules可能与当前文件在同一级目录下，或者在上层目录里。
+    // Node会向上级目录遍历，查找每个 node_modules直到它找到要加载的模块。
+    "moduleResolution": "node",
+    "importHelpers": true,
+    // 编译后会生成什么样的代码。
+    // 如果该值是es6，你会发现生成的代码不仅包含es6的，还默认包含es5的
+    // 因为目前浏览器还有很多不支持es6，所以默认会有es5的
+    "target": "es5",
+    "typeRoots": [
+      // 对于一些默认没有ts声名的模块，告诉编译器去哪里寻找它的声明文件
+      // 比如 import * as $ from 'jquery';
+      // 编译器会去 node_modules/@types 目录下寻找声明文件
+      // 至于怎么找到 jquery，就要再配合 types 这个属性，这个属性指定了具体去找哪个模块
+      // https://stackoverflow.com/questions/39826848/typescript-2-0-types-field-in-tsconfig-json
+      "node_modules/@types"
+    ],
+    "lib": [
+      "es2018",
+      "dom"
+    ]
+  },
+  // https://angular.cn/guide/aot-compiler
+  "angularCompilerOptions": {
+    "fullTemplateTypeCheck": true,
+    "strictInjectionParameters": true
+  }
+}

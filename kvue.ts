@@ -6,7 +6,7 @@ interface KVueOptions<
     el: string | HTMLElement,
     data?: Data,
     methods?: Methods
-    created?(): void,
+    created?(this: V): any,
 }
 class KVue {
     $options: KVueOptions<KVue>
@@ -19,6 +19,12 @@ class KVue {
         this.$options = options
         this.$data = observe(this, options.data)
         this.$compile = new Compile(this.$el, this)
+        if (options.created) {
+            options.created.call(this)
+        }
+        if (options.methods) {
+            Object.assign(this, options.methods)
+        }
     }
     proxyData(data: Data): void {
         Object.keys(data).forEach(key => {
@@ -140,7 +146,6 @@ class Compile {
         const self = this
         attrs.forEach(attrName => {
             if (attrName.indexOf('k-') === 0) {
-                debugger
                 const dir = attrName.substr(2)
                 const attrValue = node.getAttribute(attrName)
                 const directiveName = `directive${dir[0].toUpperCase() + dir.substr(1)}`
